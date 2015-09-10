@@ -4,8 +4,6 @@ use strict;
 
 use st00::st00;
 
-#fdwfjofg;j
-
 my @MODULES =
 (
 	\&ST00::st00,
