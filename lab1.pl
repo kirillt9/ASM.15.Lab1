@@ -3,15 +3,17 @@
 use strict;
 
 use st00::st00;
-
+use st04::st04;
 my @MODULES =
 (
 	\&ST00::st00,
+	\&ST04::st04,
 );
 
 my @NAMES =
 (
 	"00. Sample",
+	"04. Borisenko",
 );
 
 sub menu
