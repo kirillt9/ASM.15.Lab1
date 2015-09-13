@@ -16,6 +16,18 @@ my $count=0;
 my $run=1;
 my $cashe={};
 #############Subroutines###############
+sub shortshow #get list with existed items
+{
+    while (my ($key,$val)= each (%$cashe)){
+	print "$key:$val->{'Name'}\n";
+    }
+}
+sub itemPrint{
+    my $aim=$_;
+    while (my ($key,$val)=each(%$aim)){
+	print "\t$key:$val\n";
+    }     
+}
 #############
 # getUID - generate unique number for store in $cashe
 # INPUT: none
@@ -67,7 +79,21 @@ sub add{
 # return in st04
 ############
 sub correct{
-    print "correct";
+   # my $menu="Type 'shortshow' to get item's list.\n Type 'correct <UID>'  to get item for correction.\n Return to main menu type 'abort'\n";
+   # print $menu;
+   # my $correcting=1;
+   # do{
+#	my $line=<STDIN>;
+#	chomp $line;
+#	if ($line=~ m/shortshow/i){
+#	    shortshow();
+#	}
+#	if ($line=~m/correct ([0-9]+)/i){
+#	    my $UID=$1;	    
+#	    my $aim=$cashe->{$UID};
+#	    itemPrint($aim);
+#	}
+#   }while (1);
 }
 
 #############
@@ -77,7 +103,28 @@ sub correct{
 # return in st04
 ############
 sub delete{
-    print "delete";
+    my $menu="Type 'shortshow' to get item's list.\n Type 'delete  <UID>'  to get item away from table.\n Return to main menu type 'abort'\n";
+    print $menu;
+    my $deleting=1;
+    do{
+	my $line=<STDIN>;
+	chomp $line;
+	if ($line=~ m/shortshow/i){
+	    shortshow();
+	}
+	if ($line=~m/delete ([0-9]+)/i){
+	    my $UID=$1;
+	    if (defined $cashe->{$UID}){
+		print "Item with UID=$UID will be deleted, proceed?(y/n)";
+		my $answ=<STDIN>;	    
+		delete $cashe->{$UID} if ($answ=~m/y|yes/i);
+		print "Done deletion $UID\n";}
+	    else{
+		print "Item with UID=$UID, not exist.\nChoose existed item.\n";
+	    }
+	}
+	$deleting=!($line=~m/^abort/);
+    }while ($deleting);
 }
 
 #############
@@ -86,6 +133,7 @@ sub delete{
 # OUTPUT: none
 # return in st04
 ############
+
 sub show{
     my $menu="Type 'shortshow' to get item in short format\nUID:First field\n. Type 'watch <UID>'  to get item with all filed in format\nUID\n\tfirst field\n\tsecond ...\n\tetc.\nto cancel and return to main menu type 'abort'\n";
     print $menu;
@@ -94,16 +142,12 @@ sub show{
 	my $line=<STDIN>;
 	chomp $line;
 	if ($line=~ m/shortshow/i){
-	    while (my ($key,$val)= each (%$cashe)){
-		print "$key:$val->{'Name'}\n";
-	    }
+	    shortshow();
 	}
 	if ($line=~m/watch ([0-9]+)/i){
 	    print "UID:$1\n";
 	    my $aim=$cashe->{$1};
-	    while (my ($key,$val)=each(%$aim)){
-		print "\t$key:$val\n";
-	    }   
+	    itemPrint($aim);
 	}
 	$showmustgoon=!($line=~m/^abort/);
     }while ($showmustgoon);
