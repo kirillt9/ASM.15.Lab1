@@ -23,7 +23,7 @@ sub shortshow #get list with existed items
     }
 }
 sub itemPrint{
-    my $aim=$_;
+    my ($aim)=@_;
     while (my ($key,$val)=each(%$aim)){
 	print "\t$key:$val\n";
     }     
@@ -54,14 +54,14 @@ sub add{
     my $save=0;
     my $namedefined=0;
     do{
-	
 	my $line=<STDIN>;
 	chomp $line;
 	if ($line=~ m/(\w+)\s*:\s*(.+)/){
 	    @temp=(@temp,$1,$2);
 	    $namedefined=$1 eq "Name" if not $namedefined;
 	}
-	$save=$line=~m/^end/;
+	$save=$line=~m/^end$/i;
+	return if ($line=~m/^abort$/i);
 	if ($save and (not $namedefined)){
 	    print "'Name' attribute must be defined!\n";
 	    $save=0;
@@ -79,21 +79,36 @@ sub add{
 # return in st04
 ############
 sub correct{
-   # my $menu="Type 'shortshow' to get item's list.\n Type 'correct <UID>'  to get item for correction.\n Return to main menu type 'abort'\n";
-   # print $menu;
-   # my $correcting=1;
-   # do{
-#	my $line=<STDIN>;
-#	chomp $line;
-#	if ($line=~ m/shortshow/i){
-#	    shortshow();
-#	}
-#	if ($line=~m/correct ([0-9]+)/i){
-#	    my $UID=$1;	    
-#	    my $aim=$cashe->{$UID};
-#	    itemPrint($aim);
-#	}
-#   }while (1);
+    my $menu="Type 'shortshow' to get item's list.\n Type 'correct <UID>'  to get item for correction.\n Return to main menu type 'abort'\n";
+    print $menu;
+    my $correcting=1;
+    while ($correcting){
+	my $line=<STDIN>;
+	chomp $line;
+	if ($line=~ m/shortshow/i){
+	    shortshow();
+	}
+	if ($line=~m/correct ([0-9]+)/i){
+	    my $UID=$1;
+	    if (defined $cashe->{$UID}){	    
+		my $aim=$cashe->{$UID};
+		itemPrint($aim);
+		print "To correct type:\nAttribute:Value\n Type 'end' to finish correction.\n";
+		my $act=1;	   
+		while($act){ 
+		    my $row=<STDIN>;
+		    chomp $row;
+		    if ($row=~ m/(\w+)\s*:\s*(.+)/){
+			$cashe->{$UID}->{$1}=$2;
+		    }
+		    $act=!($row=~m/^end$/i);
+		}
+	    }else{
+		print "Item with UID=$UID not exist.\n"
+	    }
+	}
+	$correcting=!($line=~m/^abort$/i);
+    }
 }
 
 #############
@@ -123,7 +138,7 @@ sub delete{
 		print "Item with UID=$UID, not exist.\nChoose existed item.\n";
 	    }
 	}
-	$deleting=!($line=~m/^abort/);
+	$deleting=!($line=~m/^abort$/i);
     }while ($deleting);
 }
 
@@ -149,7 +164,7 @@ sub show{
 	    my $aim=$cashe->{$1};
 	    itemPrint($aim);
 	}
-	$showmustgoon=!($line=~m/^abort/);
+	$showmustgoon=!($line=~m/^abort$/i);
     }while ($showmustgoon);
 }
 
