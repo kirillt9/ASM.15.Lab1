@@ -10,7 +10,6 @@ package ST04;
 #- при загрузке в память каждый объект хранится в виде ссылки на анонимный хэш, вся картотека хранится в виде массива (либо хэша) ссылок.
 use strict;
 use DB_File;
-use warnings;
 use Data::Dumper; #debug purpose
 #############Global Variables#############
 my $count=0;
@@ -36,22 +35,29 @@ sub getUID{
 # return in st04
 ############
 sub add{
-    my $menu="To add new item type in format:\nAttribute:Value\ntype 'end' to finish definition and insert item to current data\n";
+    my $menu="To add new item type in format:\nAttribute:Value\nBe careful 'Name' attribute must be present!\ntype 'end' to finish definition and insert item to current data\n";
     my @temp=();
     print "Currently $count items\n";
     print $menu;
     my $save=0;
+    my $namedefined=0;
     do{
+	
 	my $line=<STDIN>;
 	chomp $line;
-	if ($line=~ m/^(\w+):(\w+)\b/){
+	if ($line=~ m/(\w+)\s*:\s*(.+)/){
 	    @temp=(@temp,$1,$2);
+	    $namedefined=$1 eq "Name" if not $namedefined;
 	}
 	$save=$line=~m/^end/;
+	if ($save and (not $namedefined)){
+	    print "'Name' attribute must be defined!\n";
+	    $save=0;
+	}
     }while (!$save);
     my $uid = getUID();
     $cashe->{$uid}={@temp};
-    #print Dumper $cashe; debug purpose
+    print Dumper $cashe; #debug purpose
 }
 
 #############
@@ -75,13 +81,32 @@ sub delete{
 }
 
 #############
-# add - call menu for interactively add new item in the $cashe
+# show - call menu for interactively show items in the $cashe
 # INPUT: none
 # OUTPUT: none
 # return in st04
 ############
 sub show{
-    print "show";
+    my $menu="Type 'shortshow' to get item in short format\nUID:First field\n. Type 'watch <UID>'  to get item with all filed in format\nUID\n\tfirst field\n\tsecond ...\n\tetc.\nto cancel and return to main menu type 'abort'\n";
+    print $menu;
+    my $showmustgoon=1;
+    do {
+	my $line=<STDIN>;
+	chomp $line;
+	if ($line=~ m/shortshow/i){
+	    while (my ($key,$val)= each (%$cashe)){
+		print "$key:$val->{'Name'}\n";
+	    }
+	}
+	if ($line=~m/watch ([0-9]+)/i){
+	    print "UID:$1\n";
+	    my $aim=$cashe->{$1};
+	    while (my ($key,$val)=each(%$aim)){
+		print "\t$key:$val\n";
+	    }   
+	}
+	$showmustgoon=!($line=~m/^abort/);
+    }while ($showmustgoon);
 }
 
 #############
