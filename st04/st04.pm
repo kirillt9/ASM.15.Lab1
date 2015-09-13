@@ -11,11 +11,24 @@ package ST04;
 use strict;
 use DB_File;
 use warnings;
+use Data::Dumper; #debug purpose
 #############Global Variables#############
-
+my $count=0;
 my $run=1;
 my $cashe={};
 #############Subroutines###############
+#############
+# getUID - generate unique number for store in $cashe
+# INPUT: none
+# OUTPUT: NUMBER uid
+#############
+sub getUID{
+    my $UID=0;
+    for (keys %$cashe) {
+	$UID=$_ if $UID<$_;
+    }
+    return $UID+1;
+}
 #############
 # add - call menu for interactively add new item in the $cashe
 # INPUT: none
@@ -23,7 +36,22 @@ my $cashe={};
 # return in st04
 ############
 sub add{
-    print "add";
+    my $menu="To add new item type in format:\nAttribute:Value\ntype 'end' to finish definition and insert item to current data\n";
+    my @temp=();
+    print "Currently $count items\n";
+    print $menu;
+    my $save=0;
+    do{
+	my $line=<STDIN>;
+	chomp $line;
+	if ($line=~ m/^(\w+):(\w+)\b/){
+	    @temp=(@temp,$1,$2);
+	}
+	$save=$line=~m/^end/;
+    }while (!$save);
+    my $uid = getUID();
+    $cashe->{$uid}={@temp};
+    #print Dumper $cashe; debug purpose
 }
 
 #############
