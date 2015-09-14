@@ -175,7 +175,31 @@ sub show{
 # return in st04
 ############
 sub save{
-    print "save";
+    my $menu="Type 'save filename' to save current data to file.Be aware that existed file will be overwritten.\nTo cancel and return to main menu type 'abort'\n";
+    print $menu;
+    my $saving=1;
+    do {
+	my $line=<STDIN>;
+	chomp $line;
+	if ($line=~ m/save (\w+)/i){
+	    my $filename="st04/". $1;
+	    $filename.="\.dbm" unless ($1=~m/\w+.dbm/);
+	    my %localdbm;
+	    dbmopen(%localdbm,"$filename",0777) or print "Can't create $filename";
+	    for (keys %{$cashe}) {	
+		my @data=();
+		while (my ($key,$val)=each %{$cashe->{$_}}){
+		    push @data, ($key. ':' .$val);
+		}
+		$localdbm{$_}=join (':',@data);
+	    }
+	    dbmclose(%localdbm);
+	    $saving=0;
+	}
+	else{
+	    $saving=!($line=~m/^abort$/i);
+	}
+    }while ($saving);
 }
 
 #############
