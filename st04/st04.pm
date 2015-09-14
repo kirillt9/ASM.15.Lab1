@@ -209,7 +209,36 @@ sub save{
 # return in st04
 ############
 sub load{
-    print "load";
+    my $menu="Type 'open filename' to load data from file.File must be present in module folder.\nTo cancel and return to main menu type 'abort'\n";
+    print $menu;
+    my $loading=1;
+    while ($loading){
+	my $line=<STDIN>;
+	chomp $line;
+	if ($line=~ m/open (\w+)/i){
+	    if (keys %{$cashe}){
+		print "Dublicate items will be overwritten! Proceed?(y/n)\n";
+		my $ans=<STDIN>;
+		unless ($ans=~m/y|yes/i){
+		    continue;
+		}
+	    }
+	    my $filename="st04/". $1 unless ($1=~m|sto4/\w+|);
+	    $filename.="\.dbm" unless ($1=~m/\w+.dbm/);
+	    my %localdbm;
+	    dbmopen(%localdbm,"$filename",0) or print "Can't open $filename";
+	    while (my ($key,$val) = each %localdbm) {
+		my @data=split ':', $val;
+		my %dataconv=@data;
+		$cashe->{$key} =\%dataconv;
+	    }
+	    dbmclose(%localdbm);
+	    $loading=0;
+	}
+	else{
+	    $loading=!($line=~m/^abort$/i);
+	}
+    }
 }
 
 #############
