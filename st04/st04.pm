@@ -12,7 +12,7 @@ use strict;
 use DB_File;
 use Data::Dumper; #debug purpose
 #############Global Variables#############
-my $count=0;
+my $count;
 my $run=1;
 my $cashe={};
 #############Subroutines###############
@@ -47,7 +47,7 @@ sub getUID{
 # return in st04
 ############
 sub add{
-    my $menu="To add new item type in format:\nAttribute:Value\nBe careful 'Name' attribute must be present!\ntype 'end' to finish definition and insert item to current data\n";
+    my $menu="To add new item type in format:\nAttribute:Value\nBe careful 'Name' attribute must be present!\ntype 'end' to finish definition and insert item to current data\nTo cancel adding type 'abort'\n";
     my @temp=();
     print "Currently $count items\n";
     print $menu;
@@ -69,7 +69,8 @@ sub add{
     }while (!$save);
     my $uid = getUID();
     $cashe->{$uid}={@temp};
-    print Dumper $cashe; #debug purpose
+    $count+=1;
+    #print Dumper $cashe; #debug purpose
 }
 
 #############
@@ -133,6 +134,7 @@ sub delete{
 		print "Item with UID=$UID will be deleted, proceed?(y/n)";
 		my $answ=<STDIN>;	    
 		delete $cashe->{$UID} if ($answ=~m/y|yes/i);
+		$count-=1;
 		print "Done deletion $UID\n";}
 	    else{
 		print "Item with UID=$UID, not exist.\nChoose existed item.\n";
@@ -230,7 +232,9 @@ sub load{
 	    while (my ($key,$val) = each %localdbm) {
 		my @data=split ':', $val;
 		my %dataconv=@data;
+		$count+=1 if not defined $cashe->{$key};
 		$cashe->{$key} =\%dataconv;
+		
 	    }
 	    dbmclose(%localdbm);
 	    $loading=0;
@@ -264,6 +268,7 @@ my $menuEntry={
 sub st04
 {
     my $Menu="Menu:\nAdd(1),Corect(2),Delete(3),Show list(4),Save to file(5),Load from file(6),Qiut(0)\n";
+    $count=0;
     while ($run) {    
 	print "$Menu";
 	my $choice=<STDIN>;
