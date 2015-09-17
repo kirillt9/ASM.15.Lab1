@@ -12,7 +12,7 @@ use strict;
 use DB_File;
 use Data::Dumper; #debug purpose
 #############Global Variables#############
-my $count;
+my $count=0;
 my $run=1;
 my $cashe={};
 #############Subroutines###############
@@ -69,7 +69,7 @@ sub add{
     }while (!$save);
     my $uid = getUID();
     $cashe->{$uid}={@temp};
-    $count+=1;
+    $count++;
     #print Dumper $cashe; #debug purpose
 }
 
@@ -134,7 +134,7 @@ sub delete{
 		print "Item with UID=$UID will be deleted, proceed?(y/n)";
 		my $answ=<STDIN>;	    
 		delete $cashe->{$UID} if ($answ=~m/y|yes/i);
-		$count-=1;
+		$count--;
 		print "Done deletion $UID\n";}
 	    else{
 		print "Item with UID=$UID, not exist.\nChoose existed item.\n";
@@ -148,7 +148,7 @@ sub delete{
 # show - call menu for interactively show items in the $cashe
 # INPUT: none
 # OUTPUT: none
-# return in st04
+ # return in st04
 ############
 
 sub show{
@@ -232,7 +232,9 @@ sub load{
 	    while (my ($key,$val) = each %localdbm) {
 		my @data=split ':', $val;
 		my %dataconv=@data;
-		$count+=1 if not defined $cashe->{$key};
+		my $de=defined $cashe->{$key};
+		print ("def $de\n");
+		$count++ unless (defined $cashe->{$key});
 		$cashe->{$key} =\%dataconv;
 		
 	    }
@@ -268,9 +270,8 @@ my $menuEntry={
 sub st04
 {
     my $Menu="Menu:\nAdd(1),Corect(2),Delete(3),Show list(4),Save to file(5),Load from file(6),Qiut(0)\n";
-    $count=0;
     while ($run) {    
-	print "$Menu";
+	print "$Menu"."There are $count items in a table\n";
 	my $choice=<STDIN>;
 	chomp $choice;
 	$menuEntry->{$choice}->() if defined $menuEntry->{$choice};
