@@ -1,7 +1,6 @@
-#!C:/Perl64/bin/perl
-
 package Person;
 
+use strict;
 sub new
 {
     my $class = shift;
@@ -14,6 +13,8 @@ sub new
     bless $self, $class;
     return $self;
 }
+
+
 sub setFirstName {
     my ( $self, $firstName ) = @_;
     $self->{_firstName} = $firstName if defined($firstName);
@@ -45,4 +46,4 @@ sub getID {
     my( $self ) = @_;
     return $self->{_id};
 }
-1;
+return 1;

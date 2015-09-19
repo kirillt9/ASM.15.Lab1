@@ -18,6 +18,18 @@ my $check_input = sub {
        }	
 };
 
+my $group_IsNull = sub { 
+    if(@group >0)
+    {
+        return 1;
+    }
+    else
+    {
+        print "\n######### Group is empty ########\n" ;
+        return 0;
+    }
+};
+
 #menu function 
 sub menu {
     my @items = @_;
@@ -42,12 +54,15 @@ sub menu {
 
 #print student's function 
 my $print_students = sub { 
-    print "\n######### Print Group ########\n" ;
-    my $count = 0;
-    for my $item( @group ) {
-        printf "%d: FName:%s LName:%s id:%d \n", ++$count, $item->getFirstName(),$item->getLastName(),$item->getID();
+    if(&$group_IsNull == 1)
+    {
+        print "\n######### Print Group ########\n" ;
+        my $count = 0;
+        for my $item( @group ) {
+            printf "%d: FName:%s LName:%s id:%d \n", ++$count, $item->getFirstName(),$item->getLastName(),$item->getID();
+        }
+        print "\n";
     }
-    print "\n";
 };
 
 #add student function 
@@ -59,47 +74,36 @@ my $add_student = sub {
     chomp (my $l_name = <STDIN>);
     print "ID: \n";
     chomp (my $id = <STDIN>);
-    push(@group,new Person( $f_name, $l_name, $id));
+    push(@group,Person->new($f_name, $l_name, $id));
     &$print_students(); 
 };
 
 #edit student function 
 my $edit_student = sub { 
-    if(@group >0)
-    {
+    if(&$group_IsNull == 1)
+    { 
         print "\n########## Edit Student  #########\n" ;
         &$print_students(); 
         print "Enter student number:\n";
-        while( my $choice = <STDIN> ) {
-            chomp $choice;
-            if ( $choice =~ m/\d+/ && $choice <= @group && $choice>0 ) {
-                print "First Name :\n";
-                chomp (my $f_name = <STDIN>);
-                $group[$choice-1]->setFirstName($f_name); 
-                print "Last Name :\n";
-                chomp (my $l_name = <STDIN>);;
-                $group[$choice-1]->setLastName($l_name); 
-                print "ID: \n";
-                chomp (my $id = <STDIN>);
-                $group[$choice-1]->setID($id); 
-                &$print_students();
-                last;
-            }
-            print "\nInvalid input\n\nYour choice: ";
-        }
-        
+        my $choice = &$check_input();
+        print "First Name :\n";
+        chomp (my $f_name = <STDIN>);
+        $group[$choice-1]->setFirstName($f_name); 
+        print "Last Name :\n";
+        chomp (my $l_name = <STDIN>);;
+        $group[$choice-1]->setLastName($l_name); 
+        print "ID: \n";
+        chomp (my $id = <STDIN>);
+        $group[$choice-1]->setID($id); 
+        &$print_students();
     }
-    else{
-         print "\n######### Group is empty ########\n" ;
-    }
-
 };
 
 
 
 #delete_student function 
 my $del_student = sub { 
-    if(@group >0)
+    if(&$group_IsNull == 1)
     {
         print "\n######### Delete Student ########\n" ;
         &$print_students(); 
@@ -107,20 +111,7 @@ my $del_student = sub {
         my $choice = &$check_input();
         splice @group,$choice-1,1;
         &$print_students();
-        #while( my $choice = <STDIN> ) {
-         #   chomp $choice;
-          #  if ( $choice =~ m/\d+/ && $choice <= @group && $choice>0 ) {
-               
-           #     last;
-            #}
-
-           # print "\nInvalid input\n\nYour choice: ";
-        #}
-    }
-    else{
-         print "\n######### Group is empty ########\n" ;
-    }
-    
+    }  
 };
 
 
@@ -134,9 +125,6 @@ my $load_students = sub {
     print "\n######### Load Group ########\n" ;
  
 };
-
-
-
 
 
 # menu 
@@ -156,10 +144,6 @@ my @menu_choices = (
     { text  => 'exit',
       code  =>  sub { $res = 0;}  }
 );
-
-
-
-
 
 sub st26
 {
