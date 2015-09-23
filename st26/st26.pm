@@ -6,16 +6,16 @@ use Person;
 
 my @group;  
 my $res = 1;
-
+my $filename = "st26db";
 my $check_input = sub { 
     while( my $choice = <STDIN> ) {
             chomp $choice;
             if ( $choice =~ m/\d+/ && $choice <= @group && $choice>0 ) {
-              	return $choice;
+                return $choice;
             }
 
             print "\nInvalid input\n\nYour choice: ";
-       }	
+       }    
 };
 
 my $group_IsNull = sub { 
@@ -117,13 +117,49 @@ my $del_student = sub {
 
 #save students to dbm file function 
 my $save_students = sub { 
-     print "\n######### Save Group ########\n" ;
+    dbmopen(my %HASH, $filename, 0666) or die "Can't open $filename: $!\n";
+    %HASH = ();
+    dbmclose %HASH;
+    if(&$group_IsNull == 1)
+    {
+        print "\n######### Save Group ########\n";
+        
+        dbmopen(my %test, $filename, 0666) or die "Cant open testdb file\n";
+        my $count = 0;
+        foreach (@group) { 
+            $count+=1;
+            $test{"fname$count"} =$_->getFirstName() ;
+            $test{"lname$count"} =$_->getLastName() ;
+            $test{"id$count"} = $_->getID() ;
+        }
+        
+        dbmclose(%test);
+    }
 };
 
 #load students from dbm file function 
 my $load_students = sub { 
-    print "\n######### Load Group ########\n" ;
- 
+        undef(@group);
+        print "\n######### Load Group ########\n" ;
+        dbmopen(my %test, $filename, 0444) or die "Cant open testdb file\n";
+        my $f;
+        my $l;
+        foreach my $key ( keys %test ) {
+            if (index($key, 'fname') != -1  )
+            {
+                $f = $test{$key};
+            }
+            if (index($key, 'lname') != -1 )
+            {
+                $l = $test{$key};
+            }
+            if (index($key, 'id') != -1 )
+            {
+                push(@group,Person->new($f, $l, $test{$key}));
+            }
+        }
+        dbmclose(%test);
+        &$print_students(); 
 };
 
 
@@ -142,15 +178,14 @@ my @menu_choices = (
     { text  => 'load',
       code  => $load_students },
     { text  => 'exit',
-      code  =>  sub { $res = 0;}  }
+      code  =>  sub { $res = 0;}}
 );
 
-sub st26
+sub st26 
 {
 	while($res)
 	{
-	    menu( @menu_choices );
+		menu( @menu_choices );
 	}
 }
-
 return 1;
