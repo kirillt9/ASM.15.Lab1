@@ -2,11 +2,13 @@ package ST26;
 
 use strict;
 use warnings;
-use Person;
+use st26::Person;
 
 my @group;  
 my $res = 1;
 my $filename = "st26db";
+
+#helper functions
 my $check_input = sub { 
     while( my $choice = <STDIN> ) {
             chomp $choice;
@@ -25,7 +27,7 @@ my $group_IsNull = sub {
     }
     else
     {
-        print "\n######### Group is empty ########\n" ;
+        print "\n######### Group is empty. Create or load group !!! ########\n" ;
         return 0;
     }
 };
@@ -50,9 +52,7 @@ sub menu {
     }
 };
 
-
-
-#print student's function 
+#print students function 
 my $print_students = sub { 
     if(&$group_IsNull == 1)
     {
@@ -99,8 +99,6 @@ my $edit_student = sub {
     }
 };
 
-
-
 #delete_student function 
 my $del_student = sub { 
     if(&$group_IsNull == 1)
@@ -114,26 +112,19 @@ my $del_student = sub {
     }  
 };
 
-
 #save students to dbm file function 
 my $save_students = sub { 
-    dbmopen(my %HASH, $filename, 0666) or die "Can't open $filename: $!\n";
-    %HASH = ();
-    dbmclose %HASH;
     if(&$group_IsNull == 1)
     {
         print "\n######### Save Group ########\n";
-        
-        dbmopen(my %test, $filename, 0666) or die "Cant open testdb file\n";
+        dbmopen(my %data, $filename, 0666) or die "Cant open $filename file\n";
+        %data = ();
         my $count = 0;
         foreach (@group) { 
             $count+=1;
-            $test{"fname$count"} =$_->getFirstName() ;
-            $test{"lname$count"} =$_->getLastName() ;
-            $test{"id$count"} = $_->getID() ;
-        }
-        
-        dbmclose(%test);
+            $data{"$count"} =$_->getPerson() ;
+        }     
+        dbmclose(%data);
     }
 };
 
@@ -141,27 +132,14 @@ my $save_students = sub {
 my $load_students = sub { 
         undef(@group);
         print "\n######### Load Group ########\n" ;
-        dbmopen(my %test, $filename, 0444) or die "Cant open testdb file\n";
-        my $f;
-        my $l;
-        foreach my $key ( keys %test ) {
-            if (index($key, 'fname') != -1  )
-            {
-                $f = $test{$key};
-            }
-            if (index($key, 'lname') != -1 )
-            {
-                $l = $test{$key};
-            }
-            if (index($key, 'id') != -1 )
-            {
-                push(@group,Person->new($f, $l, $test{$key}));
-            }
+        dbmopen(my %data, $filename, 0444) or die "Cant open $filename file\n";  
+        foreach my $key ( keys %data ) {
+            (my $f, my $l,my $id )= split(/::@::/,$data{$key});
+             push(@group,Person->new($f, $l, $id));
         }
-        dbmclose(%test);
+        dbmclose(%data);
         &$print_students(); 
 };
-
 
 # menu 
 my @menu_choices = (
@@ -183,6 +161,7 @@ my @menu_choices = (
 
 sub st26 
 {
+    $res = 1;
 	while($res)
 	{
 		menu( @menu_choices );

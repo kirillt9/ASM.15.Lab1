@@ -46,4 +46,11 @@ sub getID {
     my( $self ) = @_;
     return $self->{_id};
 }
+
+
+sub getPerson{
+    my( $self ) = @_;
+    return $self->{_firstName}."::@::".$self->{_lastName}."::@::".$self->{_id};
+
+}
 return 1;
