@@ -6,19 +6,24 @@ use strict;
 #############Global Variables#############
 my $count=0;
 my $run=1;
-my $cashe={};
+my $cache={};
+my $currentkeys={"Name"=>1};
 #############Subroutines###############
 sub shortshow #get list with existed items
 {
-    while (my ($key,$val)= each (%$cashe)){
-	print "$key:$val->{'Name'}\n";
+    print "\n=======\n";
+    while (my ($key,$val)= each (%$cache)){
+	print "\t$key:$val->{'Name'}\n";
     }
+    print "=======\n";
 }
 sub itemPrint{
+    print "\n=======\n";
     my ($aim)=@_;
     while (my ($key,$val)=each(%$aim)){
 	print "\t$key:$val\n";
-    }     
+    }
+    print "=======\n";
 }
 #############
 # getUID - generate unique number for store in $cashe
@@ -27,55 +32,71 @@ sub itemPrint{
 #############
 sub getUID{
     my $UID=0;
-    for (keys %$cashe) {
+    for (keys %$cache) {
 	$UID=$_ if $UID<$_;
     }
     return $UID+1;
 }
 #############
-# add - call menu for interactively add new item in the $cashe
+# add - call menu for interactively add new item in the $cashe'
 # INPUT: none
 # OUTPUT: none
 # return in st04
 ############
 sub add{
-    my $menu="To add new item type in format:\nAttribute:Value\nBe careful 'Name' attribute must be present!\ntype 'end' to finish definition and insert item to current data\nTo cancel adding type 'abort'\n";
+    
+    my $menu="\n\nTo add new item type in format:\nAttribute:Value\nBe careful 'Name' attribute must be present!\ntype 'end' to finish definition and insert item to current data\nTo cancel adding type 'abort'\n";
     my @temp=();
+   
     print "Currently $count items\n";
-    print $menu;
-    my $save=0;
-    my $namedefined=0;
-    do{
-	my $line=<STDIN>;
-	chomp $line;
-	if ($line=~ m/(\w+)\s*:\s*(.+)/){
-	    @temp=(@temp,$1,$2);
-	    $namedefined=$1 eq "Name" if not $namedefined;
+    if (!$count){
+	print $menu;
+	my $save=0;
+	my $namedefined=0;
+	do{
+	    my $line=<STDIN>;
+	    chomp $line;
+	    if ($line=~ m/(\w+)\s*:\s*(.+)/){
+		@temp=(@temp,$1,$2);
+		$currentkeys->{$1}=1;
+		$namedefined=$1 eq "Name" unless $namedefined;
+	    }
+	    $save=$line=~m/^end$/i;
+	    return if ($line=~m/^abort$/i);
+	    if ($save and (not $namedefined)){
+		print "'Name' attribute must be defined!\n";
+		$save=0;
+	    }
+	}while (!$save);
+    }else{
+	print "\nCurrent table contains:\n";
+	print join ("\n",keys %$currentkeys);
+	print "\n column. Now you can add new row by order.\n To cancel type 'abort'\n";
+	while (my ($key,$rs)=each(%$currentkeys)) {
+	    print "$key:";
+	    my $val=<STDIN>;
+	    chomp $val;
+	    return if ($val=~/^abort$/);
+	    @temp=(@temp,$key,$val);
 	}
-	$save=$line=~m/^end$/i;
-	return if ($line=~m/^abort$/i);
-	if ($save and (not $namedefined)){
-	    print "'Name' attribute must be defined!\n";
-	    $save=0;
-	}
-    }while (!$save);
+    }
     my $uid = getUID();
-    $cashe->{$uid}={@temp};
+    $cache->{$uid}={@temp};
     $count++;
-    #print Dumper $cashe; #debug purpose
+	
 }
 
 #############
-# correct - call menu for interactively correct existed item in the $cashe
+# correct - call menu for interactively correct existed item in the $cache
 # INPUT: none
 # OUTPUT: none
 # return in st04
 ############
 sub correct{
-    my $menu="Type 'shortshow' to get item's list.\n Type 'correct <UID>'  to get item for correction.\n Return to main menu type 'abort'\n";
-    print $menu;
+    my $menu="\n\nType 'shortshow' to get item's list.\n Type 'correct <UID>'  to get item for correction.\n Return to main menu type 'abort'\n";
     my $correcting=1;
     while ($correcting){
+	print $menu;
 	my $line=<STDIN>;
 	chomp $line;
 	if ($line=~ m/shortshow/i){
@@ -83,8 +104,8 @@ sub correct{
 	}
 	if ($line=~m/correct ([0-9]+)/i){
 	    my $UID=$1;
-	    if (defined $cashe->{$UID}){	    
-		my $aim=$cashe->{$UID};
+	    if (defined $cache->{$UID}){	    
+		my $aim=$cache->{$UID};
 		itemPrint($aim);
 		print "To correct type:\nAttribute:Value\n Type 'end' to finish correction.\n";
 		my $act=1;	   
@@ -92,7 +113,7 @@ sub correct{
 		    my $row=<STDIN>;
 		    chomp $row;
 		    if ($row=~ m/(\w+)\s*:\s*(.+)/){
-			$cashe->{$UID}->{$1}=$2;
+			$aim->{$1}=$2 if (defined $aim->{$1});
 		    }
 		    $act=!($row=~m/^end$/i);
 		}
@@ -105,16 +126,17 @@ sub correct{
 }
 
 #############
-# delete - call menu for interactively delete existed item in the $cashe
+# delete - call menu for interactively delete existed item in the $cache
 # INPUT: none
 # OUTPUT: none
 # return in st04
 ############
 sub delete{
-    my $menu="Type 'shortshow' to get item's list.\n Type 'delete  <UID>'  to get item away from table.\n Return to main menu type 'abort'\n";
-    print $menu;
+    my $menu="\n\nType 'shortshow' to get item's list.\n Type 'delete  <UID>'  to get item away from table.\n Return to main menu type 'abort'\n";
+   
     my $deleting=1;
     do{
+	print $menu;
 	my $line=<STDIN>;
 	chomp $line;
 	if ($line=~ m/shortshow/i){
@@ -122,10 +144,10 @@ sub delete{
 	}
 	if ($line=~m/delete ([0-9]+)/i){
 	    my $UID=$1;
-	    if (defined $cashe->{$UID}){
+	    if (defined $cache->{$UID}){
 		print "Item with UID=$UID will be deleted, proceed?(y/n)";
 		my $answ=<STDIN>;	    
-		delete $cashe->{$UID} if ($answ=~m/y|yes/i);
+		delete $cache->{$UID} if ($answ=~m/y|yes/i);
 		$count--;
 		print "Done deletion $UID\n";}
 	    else{
@@ -137,17 +159,18 @@ sub delete{
 }
 
 #############
-# show - call menu for interactively show items in the $cashe
+# show - call menu for interactively show items in the $cache
 # INPUT: none
 # OUTPUT: none
- # return in st04
+# return in st04
 ############
 
 sub show{
-    my $menu="Type 'shortshow' to get item in short format\nUID:First field\n. Type 'watch <UID>'  to get item with all filed in format\nUID\n\tfirst field\n\tsecond ...\n\tetc.\nto cancel and return to main menu type 'abort'\n";
-    print $menu;
+    my $menu="\n\nType 'shortshow' to get item in short format\nUID:First field\n. Type 'watch <UID>'  to get item with all filed in format\nUID\n\tfirst field\n\tsecond ...\n\tetc.\nto cancel and return to main menu type 'abort'\n";
+   
     my $showmustgoon=1;
     do {
+	print $menu;
 	my $line=<STDIN>;
 	chomp $line;
 	if ($line=~ m/shortshow/i){
@@ -155,7 +178,7 @@ sub show{
 	}
 	if ($line=~m/watch ([0-9]+)/i){
 	    print "UID:$1\n";
-	    my $aim=$cashe->{$1};
+	    my $aim=$cache->{$1};
 	    itemPrint($aim);
 	}
 	$showmustgoon=!($line=~m/^abort$/i);
@@ -163,16 +186,17 @@ sub show{
 }
 
 #############
-# save - call menu for interactively save $cashe to dbm file
+# save - call menu for interactively save $cache to dbm file
 # INPUT: none
 # OUTPUT: none
 # return in st04
 ############
 sub save{
-    my $menu="Type 'save filename' to save current data to file.Be aware that existed file will be overwritten.\nTo cancel and return to main menu type 'abort'\n";
-    print $menu;
+    my $menu="\n\nType 'save filename' to save current data to file.Be aware that existed file will be overwritten.\nTo cancel and return to main menu type 'abort'\n";
+    
     my $saving=1;
     do {
+	print $menu;
 	my $line=<STDIN>;
 	chomp $line;
 	if ($line=~ m/save (\w+)/i){
@@ -180,12 +204,12 @@ sub save{
 	    $filename.="\.dbm" unless ($1=~m/\w+.dbm/);
 	    my %localdbm;
 	    dbmopen(%localdbm,"$filename",0777) or print "Can't create $filename";
-	    for (keys %{$cashe}) {	
+	    for (keys %{$cache}) {	
 		my @data=();
-		while (my ($key,$val)=each %{$cashe->{$_}}){
-		    push @data, ($key. ':' .$val);
+		while (my ($key,$val)=each %{$cache->{$_}}){
+		    push @data, ($key. ':::' .$val);
 		}
-		$localdbm{$_}=join (':',@data);
+		$localdbm{$_}=join (':::',@data);
 	    }
 	    dbmclose(%localdbm);
 	    $saving=0;
@@ -197,38 +221,39 @@ sub save{
 }
 
 #############
-# load - call menu for interactively load data from dbm file and put it to $cashe
+# load - call menu for interactively load data from dbm file and put it to $cache
 # INPUT: none
 # OUTPUT: none
 # return in st04
 ############
 sub load{
-    my $menu="Type 'open filename' to load data from file.File must be present in module folder.\nTo cancel and return to main menu type 'abort'\n";
-    print $menu;
+    my $menu="\n\nType 'open filename' to load data from file.File must be present in module folder.\nTo cancel and return to main menu type 'abort'\n";
+    
     my $loading=1;
     while ($loading){
+	print $menu;
 	my $line=<STDIN>;
 	chomp $line;
 	if ($line=~ m/open (\w+)/i){
-	    if (keys %{$cashe}){
-		print "Dublicate items will be overwritten! Proceed?(y/n)\n";
+	    if (keys %{$cache}){
+		print "Current table will be droped! Proceed?(y/n)\n";
 		my $ans=<STDIN>;
 		unless ($ans=~m/y|yes/i){
 		    continue;
 		}
 	    }
-	    my $filename="st04/". $1 unless ($1=~m|sto4/\w+|);
+	    $cache={};
+	    my $filename="st04/". $1 unless ($1=~m|st04/\w+|);
 	    $filename.="\.dbm" unless ($1=~m/\w+.dbm/);
 	    my %localdbm;
 	    dbmopen(%localdbm,"$filename",0) or print "Can't open $filename";
 	    while (my ($key,$val) = each %localdbm) {
-		my @data=split ':', $val;
+		my @data=split ':::', $val;
 		my %dataconv=@data;
-		my $de=defined $cashe->{$key};
-		print ("def $de\n");
-		$count++ unless (defined $cashe->{$key});
-		$cashe->{$key} =\%dataconv;
-		
+		$currentkeys=map{$_=>1}keys %dataconv;
+		my $de=defined $cache->{$key};
+		$count++ unless (defined $cache->{$key});
+		$cache->{$key} =\%dataconv;
 	    }
 	    dbmclose(%localdbm);
 	    $loading=0;
