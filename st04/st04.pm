@@ -7,7 +7,7 @@ use strict;
 my $count=0;
 my $run=1;
 my $cache={};
-my $currentkeys={"Name"=>1};
+my $currentkeys=["Name","Status","Address","E-Mail"];
 #############Subroutines###############
 sub shortshow #get list with existed items
 {
@@ -20,8 +20,8 @@ sub shortshow #get list with existed items
 sub itemPrint{
     print "\n=======\n";
     my ($aim)=@_;
-    while (my ($key,$val)=each(%$aim)){
-	print "\t$key:$val\n";
+    foreach (@$currentkeys){
+	print "\t$_:$aim->{$_}\n";
     }
     print "=======\n";
 }
@@ -45,41 +45,17 @@ sub getUID{
 ############
 sub add{
     
-    my $menu="\n\nTo add new item type in format:\nAttribute:Value\nBe careful 'Name' attribute must be present!\ntype 'end' to finish definition and insert item to current data\nTo cancel adding type 'abort'\n";
+    my $menu="\n\nNow you can interactively add items in table\nTo cancel adding type 'abort'\n";
     my @temp=();
-   
-    print "Currently $count items\n";
-    if (!$count){
-	print $menu;
-	my $save=0;
-	my $namedefined=0;
-	do{
-	    my $line=<STDIN>;
-	    chomp $line;
-	    if ($line=~ m/(\w+)\s*:\s*(.+)/){
-		@temp=(@temp,$1,$2);
-		$currentkeys->{$1}=1;
-		$namedefined=$1 eq "Name" unless $namedefined;
-	    }
-	    $save=$line=~m/^end$/i;
-	    return if ($line=~m/^abort$/i);
-	    if ($save and (not $namedefined)){
-		print "'Name' attribute must be defined!\n";
-		$save=0;
-	    }
-	}while (!$save);
-    }else{
-	print "\nCurrent table contains:\n";
-	print join ("\n",keys %$currentkeys);
-	print "\n column. Now you can add new row by order.\n To cancel type 'abort'\n";
-	while (my ($key,$rs)=each(%$currentkeys)) {
-	    print "$key:";
-	    my $val=<STDIN>;
-	    chomp $val;
-	    return if ($val=~/^abort$/);
-	    @temp=(@temp,$key,$val);
-	}
+    print $menu;
+    foreach (@$currentkeys) {
+	print "$_:";
+	my $val=<STDIN>;
+	chomp $val;
+	return if ($val=~/^abort$/);
+	@temp=(@temp,$_,$val);
     }
+   
     my $uid = getUID();
     $cache->{$uid}={@temp};
     $count++;
@@ -177,9 +153,13 @@ sub show{
 	    shortshow();
 	}
 	if ($line=~m/watch ([0-9]+)/i){
-	    print "UID:$1\n";
-	    my $aim=$cache->{$1};
-	    itemPrint($aim);
+	    if (defined $cache->{$1}){
+		print "UID:$1\n";
+		my $aim=$cache->{$1};
+		itemPrint($aim);
+	    }else{
+		print "======Not existed item======\n";
+	    }
 	}
 	$showmustgoon=!($line=~m/^abort$/i);
     }while ($showmustgoon);
@@ -250,11 +230,11 @@ sub load{
 	    while (my ($key,$val) = each %localdbm) {
 		my @data=split ':::', $val;
 		my %dataconv=@data;
-		$currentkeys=map{$_=>1}keys %dataconv;
 		my $de=defined $cache->{$key};
 		$count++ unless (defined $cache->{$key});
 		$cache->{$key} =\%dataconv;
 	    }
+
 	    dbmclose(%localdbm);
 	    $loading=0;
 	}
