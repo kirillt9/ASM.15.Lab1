@@ -8,6 +8,8 @@ use st07::st07;
 use st09::st09;
 use st26::st26;
 use st30::st30;
+use st18::st18;
+
 my @MODULES =
 (
 	\&ST00::st00,
@@ -16,6 +18,7 @@ my @MODULES =
 	\&ST09::st09,
 	\&ST26::st26,
 	\&ST30::st30,
+	\&ST18::st18,
 );
 
 my @NAMES =
@@ -26,6 +29,7 @@ my @NAMES =
 	"09. Greznev",
 	"26. Mikaelian",
 	"30. Pereverzev",
+	"18. Klykov",
 );
 
 sub menu
