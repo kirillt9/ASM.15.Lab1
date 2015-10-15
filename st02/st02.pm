@@ -98,8 +98,8 @@ sub load{
 	foreach my $key (keys %HASH)
 	{
 		my @a = split(/##/,$HASH{$key});
-		my $name = @a[0];
-		my $age = @a[1];
+		my $name = $a[0];
+		my $age = $a[1];
 		my $student = {NAME => $name, AGE => $age};
 		push @group, $student;
 	}
