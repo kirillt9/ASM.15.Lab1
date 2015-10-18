@@ -14,6 +14,7 @@ use st28::st28;
 use st29::st29;
 use st30::st30;
 use st45::st45;
+use st46::st46;
 
 
 my @MODULES =
@@ -30,7 +31,7 @@ my @MODULES =
 	\&ST29::st29,
 	\&ST30::st30,
 	\&ST45::st45,
-	
+	\&ST46::st46,	
 	
 );
 
@@ -48,7 +49,7 @@ my @NAMES =
 	"29. Novozhentsev",
 	"30. Pereverzev",
 	"45. Yazkov",
-	
+	"46. Bushmakin",	
 	
 );
 
