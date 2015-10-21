@@ -7,6 +7,7 @@ use st01::st01;
 use st02::st02;
 use st04::st04;
 use st07::st07;
+use st08::st08;
 use st09::st09;
 use st18::st18;
 use st24::st24;
