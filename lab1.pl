@@ -3,6 +3,7 @@
 use strict;
 
 use st00::st00;
+use st01::st01;
 use st02::st02;
 use st04::st04;
 use st07::st07;
@@ -13,13 +14,17 @@ use st26::st26;
 use st28::st28;
 use st29::st29;
 use st30::st30;
+use st32::st32;
+use st39::st39;
 use st45::st45;
+use st46::st46;
 use st47::st47;
 
 
 my @MODULES =
 (
 	\&ST00::st00,
+	\&ST01::st01,
 	\&ST02::st02,
 	\&ST04::st04,
 	\&ST07::st07,	
@@ -30,15 +35,20 @@ my @MODULES =
 	\&ST28::st28,
 	\&ST29::st29,
 	\&ST30::st30,
+	\&ST32::st32,
+	\&ST39::st39,
 	\&ST45::st45,
+	\&ST46::st46,	
 	\&ST47::st47,
-	
+
+
 	
 );
 
 my @NAMES =
 (
 	"00. Sample",
+	"01. Baglikova",
 	"02. Badrudinova",
 	"04. Borisenko",
 	"07. Gorinov",
@@ -49,9 +59,11 @@ my @NAMES =
 	"28. Nikolaeva",
 	"29. Novozhentsev",
 	"30. Pereverzev",
+	"30. Pyatakhina",
+	"39. Stupin",
 	"45. Yazkov",
+	"46. Bushmakin",
 	"47. Utenov",
-	
 	
 );
 
