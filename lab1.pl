@@ -17,6 +17,7 @@ use st29::st29;
 use st30::st30;
 use st32::st32;
 use st39::st39;
+use st43::st43;
 use st45::st45;
 use st46::st46;
 
@@ -38,6 +39,7 @@ my @MODULES =
 	\&ST30::st30,
 	\&ST32::st32,
 	\&ST39::st39,
+	\&ST43::st43,
 	\&ST45::st45,
 	\&ST46::st46,	
 	
@@ -60,6 +62,7 @@ my @NAMES =
 	"30. Pereverzev",
 	"30. Pyatakhina",
 	"39. Stupin",
+	"43. Frolov",
 	"45. Yazkov",
 	"46. Bushmakin",	
 	
