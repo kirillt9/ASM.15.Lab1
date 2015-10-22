@@ -1,8 +1,9 @@
-
 package ST24;
 use strict;
 
-  sub st24{
+  sub st24
+{ 
+  print "st24:st24\n";
   my @list=();
   my $elemnumber=0;
   sub add{
@@ -108,11 +109,11 @@ use strict;
     
        print "\n 
               1.Add new person\n 
-    	        2.Edit element\n 
-    	        3.Delete element\n 
+    	      2.Edit element\n 
+    	      3.Delete element\n 
       	      4.Show full list\n 
-     	        5.Save to file\n 
-    	        6.Load from file\n 
+     	      5.Save to file\n 
+    	      6.Load from file\n 
               0.Exit\n ";
       
        while(my $line = <STDIN>) {
@@ -127,5 +128,7 @@ use strict;
              }
         } 
     }
+
 }
+
 return 1;
