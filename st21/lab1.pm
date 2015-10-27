@@ -2,6 +2,8 @@ package ST21;
 use 5.14.0;
 use strict;
 
+sub st21{
+
 my $greetings = "Choose procedure:\n 1. Add record;\n 2. Edit record;\n 3. Delete record;\n 4. Show all records;\n 5. Save;\n 6. Open file;\n 7. Exit. \n";
 my $board = "-"x20;
 my @records;
@@ -23,6 +25,7 @@ given($answer) {
 	when("7"){exit;}
 	default {say "Error. Procedure have not found. Please, try again\n". $board;}
 	}
+}
 }
 
 sub add {
