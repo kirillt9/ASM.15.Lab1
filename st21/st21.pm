@@ -110,12 +110,10 @@ sub save {
 
 	dbmopen(my %hash, $file, 0666);
 
-	my $count = 1;
 	my $id = 0;
 	
-	while (defined(@records[$count-1])) {
-	$hash{$id} = join('#', @records[$count-1]->{Title}, @records[$count-1]->{Year}, @records[$count-1]->{Country}, @records[$count-1]->{Rate});
-	$count = $count + 1;
+	while (defined(@records[$id])) {
+	$hash{$id} = join('#', @records[$id]->{Title}, @records[$id]->{Year}, @records[$id]->{Country}, @records[$id]->{Rate});
 	$id = $id +1;
 	}
 	dbmclose (%hash);
