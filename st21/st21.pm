@@ -9,14 +9,14 @@ sub st21
 {
 
 my $greetings = "Choose procedure:\n 1. Add record;\n 2. Edit record;\n 3. Delete record;\n 4. Show all records;\n 5. Save;\n 6. Open file;\n 7. Exit. \n";
-my $board = "-"x20;
+
 
 
 while(1) {
 
-say $greetings . $board;
+say $greetings;
 chomp(my $answer = <STDIN>);
-say $board;
+
 
 given($answer) {
 	when("1"){@procedures[0]->();}
@@ -25,8 +25,8 @@ given($answer) {
 	when("4"){@procedures[3]->();}
 	when("5"){@procedures[4]->();}
 	when("6"){@procedures[5]->();}
-	when("7"){exit;}
-	default {say "Error. Procedure have not found. Please, try again\n". $board;}
+	when("7"){return 1;}
+	default {say "Error. Procedure have not found. Please, try again\n";}
 	}
 }
 }
@@ -47,7 +47,7 @@ sub add {
 	 
 	push (@records, $new_record);
 	
-	say "\n Record added!\n".$board;
+	say "\n Record added!\n";
 }
 	
 sub edit {
@@ -68,9 +68,9 @@ sub edit {
 	@records[$number-1]->{Rate} = <STDIN>;
 	
 	say "The record has been changed!";
-	say $board;}
+	}
 	else { say "The record doesn't exist!";
-	say $board;
+	
 	}
 }
 	
@@ -83,10 +83,10 @@ sub delete {
 	if (defined(@records[$number-1])) {
 	splice(@records, $number-1, 1);
 	say "The record has been deleted!";
-	say $board;}
+	}
 	
 	else { say "The record doesn't exist!";
-	say $board;
+	;
 	}
 }
 	
@@ -98,7 +98,7 @@ sub show_all {
 	say $count . ". " . "Title: " . @records[$count-1]->{Title} . "   Year: " . @records[$count-1]->{Year} . "   Country: " . @records[$count-1]->{Country} . "   Rate: " . @records[$count-1]->{Rate};
 	$count = $count + 1;
 	}	
-	say $board;
+	
 	
 	}
 	
@@ -120,7 +120,7 @@ sub save {
 	}
 	dbmclose (%hash);
 	say "File sucsessfully saved!";
-	say $board; 
+	
 	}
 	
 sub open {
@@ -145,7 +145,7 @@ sub open {
 		dbmclose %hash;
 		
 	say "File sucsessfully opened!";
-	say $board;
+	
 		
 }
 	
