@@ -3,6 +3,7 @@ use  strict;
 
 my @list;
 
+
 my @menu =
 ( 
 	"1.Add object.",
@@ -25,6 +26,7 @@ my @option_func =
 \&fromfile,
 );
 
+sub st22 {
 while(1)
 {
 	my $ch = Print();
@@ -37,7 +39,7 @@ while(1)
 		return;
 	}
 }
-
+}
 
  sub Print {
  my $i = 1;
