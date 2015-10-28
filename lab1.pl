@@ -100,7 +100,7 @@ my @NAMES =
 	"30. Pereverzev",
 	"31. Podkolzin",
 	"32. Pyatakhina",
-	"32. Rekhlova",
+	"33. Rekhlova",
 	"37. Stankevich",
 	"38. Stepenko",
 	"39. Stupin",
