@@ -85,3 +85,5 @@ sub load{
 	push @library, $book;}
 	dbmclose %HASH;
 	print "\nThe list is loaded from a file\n";}}
+
+1;

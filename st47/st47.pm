@@ -27,7 +27,7 @@ sub get_data {
 };
 
 sub add {
-	my $сname = ( get_data "Enter the name of company: " );	
+	my $cname = ( get_data "Enter the name of company: " );	
 	my $ctown = ( get_data "Enter the city where the company is located: " );	
 	if ( ( $cname ne "" ) && ( $ctown ne "") ){
 		push @MainList, { cname => $cname, ctown => $ctown };
