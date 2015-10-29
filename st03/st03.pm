@@ -91,6 +91,7 @@ sub save
 		foreach my $elem(@list)
 		{
 			$hash{$i} = join ('--', $elem->{Name}, $elem->{Diplom}); 
+			 $i ++;
 		}
 		dbmclose %hash;		
 	}
